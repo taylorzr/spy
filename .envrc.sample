@@ -1,0 +1,4 @@
+export ORG=tacobell # <-- set your org here
+
+# I set my GITHUB_TOKEN elsewhere. If you plan to only use it for this project, you can set it here:
+# export GITHUB_TOKEN=mysecrettoken
