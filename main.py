@@ -57,8 +57,8 @@ if __name__ == "__main__":
         d = diff(ghu[id])
 
         if d:
+            print(f"updating user {ghu['login']: {d}}...")
             db.update_user(con, cur, ghu[id], d, initialized)
-            print(d)
 
     if not initialized:
         db.set_config(con, cur, "initialized", "true")

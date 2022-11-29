@@ -84,7 +84,7 @@ def remove_user(con, cur, user_id, initialized):
         sys.exit(e)
 
 
-def update_user(con, cur, user, diff):
+def update_user(con, cur, user, diff, initialized):
     data = json.dumps(diff)
 
     cur.execute("""
@@ -94,15 +94,16 @@ def update_user(con, cur, user, diff):
         (?, ?)
     """, [user["github_id"], data])
 
-    cur.execute("""
-        update users
-        set name = ?
-        , location = ?
-        , website_url = ?
-        , status_message = ?
-        , status_emoji = ?
-        where github_id = ?
-    """, [user["name"], user["location"], user["websiteUrl"], user["status_message"], user["status_emoji"], user["github_id"]])
+    if initialized:
+        cur.execute("""
+            update users
+            set name = ?
+            , location = ?
+            , website_url = ?
+            , status_message = ?
+            , status_emoji = ?
+            where github_id = ?
+        """, [user["name"], user["location"], user["websiteUrl"], user["status_message"], user["status_emoji"], user["github_id"]])
 
     con.commit()
 
