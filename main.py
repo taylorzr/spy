@@ -54,11 +54,12 @@ if __name__ == "__main__":
         db.remove_user(con, cur, id, initialized)
 
     for id in ghu:
-        d = diff(ghu[id])
+        user = ghu[id]
+        d = diff(user)
 
         if d:
-            print(f"updating user {ghu['login']: {d}}...")
-            db.update_user(con, cur, ghu[id], d, initialized)
+            print(f"updating user {user['login']}: {d}...")
+            db.update_user(con, cur, user, d, initialized)
 
     if not initialized:
         db.set_config(con, cur, "initialized", "true")
