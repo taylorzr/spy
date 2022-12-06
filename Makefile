@@ -1,4 +1,4 @@
-.PHONY: setup run db changes users locations websites statuses
+.PHONY: setup run db graph changes users locations websites statuses
 default: setup run
 
 setup:
@@ -12,6 +12,9 @@ db:
 
 schema:
 	sqlite3 spy.db .schema
+
+graph:
+	python graph.py
 
 changes:
 	sqlite3 spy.db --header --table "select users.name, users.login, set_changes.change, set_changes.time from set_changes join users on users.github_id = set_changes.user_id order by time desc limit 10"
