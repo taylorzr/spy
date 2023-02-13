@@ -5,7 +5,7 @@ import db
 import github
 
 org = os.getenv("ORG")
-github_token = os.getenv('GITHUB_TOKEN')
+github_token = os.getenv("GITHUB_TOKEN")
 
 con = sqlite3.connect("spy.db")
 cur = con.cursor()
@@ -48,10 +48,12 @@ if __name__ == "__main__":
     # But this means we need to check if someone has already been removed
     # when we're marking them removed
     dbu = db.users(con, cur, include_removed=True)
+    dbru = db.users_removed(con, cur)
     ghu = github.users(github_token, org)
 
     added = ghu.keys() - dbu.keys()
     removed = dbu.keys() - ghu.keys()
+    readded = ghu.keys() & dbru.keys()
 
     for id in added:
         if initialized:
@@ -63,6 +65,9 @@ if __name__ == "__main__":
             if initialized:
                 print(f"removing user: {dbu[id]}")
             db.remove_user(con, cur, id, initialized)
+
+    for id in readded:
+        db.readd_user(con, cur, id)
 
     for id in ghu:
         user = ghu[id]
