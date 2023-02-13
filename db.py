@@ -97,21 +97,25 @@ def update_user(con, cur, user, diff, initialized):
     if initialized:
         cur.execute("""
             update users
-            set name = ?
+            set login = ?
+            , name = ?
             , location = ?
             , website_url = ?
             , status_message = ?
             , status_emoji = ?
+            , removed = false
             where github_id = ?
-        """, [user["name"], user["location"], user["websiteUrl"], user["status_message"], user["status_emoji"], user["github_id"]])
+        """, [user["login"], user["name"], user["location"], user["websiteUrl"], user["status_message"], user["status_emoji"], user["github_id"]])
 
     con.commit()
 
 
-def users(con, cur):
-    res = cur.execute("""
-        select * from users
-        where removed = false
+def users(con, cur, include_removed=False):
+    filter = ""
+    if not include_removed:
+        filter = "where removed = false"
+    res = cur.execute(f"""
+        select * from users {filter}
     """)
 
     result = res.fetchall()

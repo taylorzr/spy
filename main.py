@@ -15,6 +15,10 @@ def diff(ghu):
     dbu = db.user(con, cur, ghu["github_id"])
 
     diff = {}
+
+    if dbu["removed"] == 1:
+        diff["removed"] = ["true", "false"]
+
     for key, value in ghu.items():
         if key in ["id", "github_id"]:
             continue
@@ -37,7 +41,13 @@ if __name__ == "__main__":
     if not initialized:
         print("looks like the first run, initializing database...")
 
-    dbu = db.users(con, cur)
+    # NOTE: We get users from database including removed
+    # because sometimes people are re-added, so we already have them in the db
+    # and just need to mark them re-added
+    #
+    # But this means we need to check if someone has already been removed
+    # when we're marking them removed
+    dbu = db.users(con, cur, include_removed=True)
     ghu = github.users(github_token, org)
 
     added = ghu.keys() - dbu.keys()
@@ -49,9 +59,10 @@ if __name__ == "__main__":
         db.create_user(con, cur, ghu[id], initialized)
 
     for id in removed:
-        if initialized:
-            print(f"removing user: {dbu[id]}")
-        db.remove_user(con, cur, id, initialized)
+        if dbu[id]["removed"] == 0:
+            if initialized:
+                print(f"removing user: {dbu[id]}")
+            db.remove_user(con, cur, id, initialized)
 
     for id in ghu:
         user = ghu[id]
